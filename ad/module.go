@@ -14,5 +14,8 @@ func NewModule(app *fiber.App) *Module {
 }
 
 func (m Module) Register() {
+	NewSearchController(m.app, NewMgmService()).RegisterRoute()
+	NewActiveController(m.app, NewMgmService()).RegisterRoute()
 	NewController(m.app, NewMgmService()).RegisterRoute()
+	NewFundingController(m.app, escrow.NewEscrow(), NewServiceMdmAdapter()).RegisterRoute()
 }
