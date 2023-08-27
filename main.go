@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"peerswap/ad"
+	"peerswap/order"
 	"peerswap/reusable"
 )
 
@@ -15,6 +16,7 @@ func main() {
 	}
 
 	app := fiber.New()
+	order.NewModule(app).Register()
 	ad.NewModule(app).Register()
 
 	app.Listen(":3000")
