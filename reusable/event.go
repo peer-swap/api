@@ -7,8 +7,12 @@ type Listener interface {
 }
 
 type Event interface {
-	Listen(event interface{}, listener Listener)
-	Emit(event interface{})
+	Emitter
+	Listen(interface{}, Listener)
+}
+
+type Emitter interface {
+	Emit(interface{})
 }
 
 type Name string
