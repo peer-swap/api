@@ -17,7 +17,7 @@ func main() {
 
 	app := fiber.New()
 	order.NewModule(app).Register()
-	ad.NewModule(app).Register()
+	ad.NewModule(app, event).Register()
 
 	app.Listen(":3000")
 }

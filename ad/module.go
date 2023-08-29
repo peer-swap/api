@@ -2,20 +2,26 @@ package ad
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"peerswap/escrow"
+	"peerswap/ad/core/service"
+	"peerswap/ad/escrow"
+	"peerswap/ad/mongo"
+	"peerswap/reusable"
 )
 
 type Module struct {
-	app *fiber.App
+	app   *fiber.App
+	event reusable.Event
 }
 
-func NewModule(app *fiber.App) *Module {
-	return &Module{app: app}
+func NewModule(app *fiber.App, event reusable.Event) *Module {
+	return &Module{app: app, event: event}
 }
 
 func (m Module) Register() {
-	NewSearchController(m.app, NewMgmService()).RegisterRoute()
-	NewActiveController(m.app, NewMgmService()).RegisterRoute()
-	NewController(m.app, NewMgmService()).RegisterRoute()
-	NewFundingController(m.app, escrow.NewEscrow(), NewServiceMdmAdapter()).RegisterRoute()
+	NewController(m.app, m.service()).RegisterRoute()
+	NewFundingController(m.app, service.NewFunding(escrow.NewAdapter(), mongo.NewAdapter(), m.event)).RegisterRoute()
+}
+
+func (m Module) service() *service.Service {
+	return service.NewService(mongo.NewAdapter(), m.event)
 }

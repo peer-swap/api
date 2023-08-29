@@ -1,10 +1,12 @@
-package ad
+package mongo
 
 import (
 	"github.com/kamva/mgm/v3"
 	"github.com/kamva/mgm/v3/operator"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"peerswap/ad/core/dto"
+	"peerswap/ad/core/service"
 )
 
 type ModelPaymentMethodField struct {
@@ -28,14 +30,14 @@ type Merchant struct {
 	Address string             `bson:"address"`
 }
 
-type ServiceMdmAdapter struct {
+type Adapter struct {
 }
 
-func NewServiceMdmAdapter() *ServiceMdmAdapter {
-	return &ServiceMdmAdapter{}
+func NewAdapter() *Adapter {
+	return &Adapter{}
 }
 
-func (s ServiceMdmAdapter) UpdateBalance(id string, amount float64) (*Dto, error) {
+func (s Adapter) UpdateBalance(id string, amount float64) (*dto.Ad, error) {
 	adModel, err := s.find(id)
 	if err != nil {
 		return nil, err
@@ -46,17 +48,17 @@ func (s ServiceMdmAdapter) UpdateBalance(id string, amount float64) (*Dto, error
 	return adModel.ToDto(), err
 }
 
-func (s ServiceMdmAdapter) Create(input StoreInputDto) (*Dto, error) {
+func (s Adapter) Create(input dto.StoreInputDto) (*dto.Ad, error) {
 	adModel := NewModelFromStoreInputDto(input)
 	err := mgm.Coll(adModel).Create(adModel)
 	if err != nil {
-		return nil, DbError
+		return nil, service.DbError
 	}
 
 	return adModel.ToDto(), nil
 }
 
-func (s ServiceMdmAdapter) Find(id string) (*Dto, error) {
+func (s Adapter) Find(id string) (*dto.Ad, error) {
 	m, err := s.find(id)
 	if err != nil {
 		return nil, err
@@ -64,7 +66,7 @@ func (s ServiceMdmAdapter) Find(id string) (*Dto, error) {
 	return m.ToDto(), nil
 }
 
-func (s ServiceMdmAdapter) UpdateActive(id string, active bool) (*Dto, error) {
+func (s Adapter) UpdateActive(id string, active bool) (*dto.Ad, error) {
 	m, err := s.find(id)
 	if err != nil {
 		return nil, err
@@ -76,7 +78,7 @@ func (s ServiceMdmAdapter) UpdateActive(id string, active bool) (*Dto, error) {
 	return m.ToDto(), err
 }
 
-func (s ServiceMdmAdapter) List(input ServiceListInputDto) ([]*Dto, error) {
+func (s Adapter) List(input dto.ServiceListInputDto) ([]*dto.Ad, error) {
 	var models []Ad
 	query := bson.M{}
 	if input.Type != "" {
@@ -101,7 +103,7 @@ func (s ServiceMdmAdapter) List(input ServiceListInputDto) ([]*Dto, error) {
 		return nil, err
 	}
 
-	var ads []*Dto
+	var ads []*dto.Ad
 	for _, model := range models {
 		ads = append(ads, model.ToDto())
 	}
@@ -109,7 +111,7 @@ func (s ServiceMdmAdapter) List(input ServiceListInputDto) ([]*Dto, error) {
 	return ads, nil
 }
 
-func (s ServiceMdmAdapter) find(id string) (*Ad, error) {
+func (s Adapter) find(id string) (*Ad, error) {
 	m := &Ad{}
 
 	err := mgm.Coll(m).FindByID(id, m)

@@ -1,7 +1,8 @@
-package ad
+package mongo
 
 import (
 	"github.com/kamva/mgm/v3"
+	"peerswap/ad/core/dto"
 	"peerswap/reusable"
 	"time"
 )
@@ -26,7 +27,7 @@ type Ad struct {
 	Active           bool                     `bson:"active"`
 }
 
-func NewModelFromStoreInputDto(input StoreInputDto) *Ad {
+func NewModelFromStoreInputDto(input dto.StoreInputDto) *Ad {
 	return &Ad{
 		Type:            input.Type,
 		Asset:           input.Asset,
@@ -41,14 +42,14 @@ func NewModelFromStoreInputDto(input StoreInputDto) *Ad {
 	}
 }
 
-func (m *Ad) ToDto() *Dto {
-	var methods []PaymentMethod
+func (m *Ad) ToDto() *dto.Ad {
+	var methods []dto.PaymentMethod
 
 	for _, method := range m.PaymentMethods {
-		var fields []PaymentMethodField
+		var fields []dto.PaymentMethodField
 
 		for _, field := range method.Fields {
-			fields = append(fields, PaymentMethodField{
+			fields = append(fields, dto.PaymentMethodField{
 				Id:          field.Id,
 				Name:        field.Name,
 				ContentType: field.ContentType,
@@ -58,7 +59,7 @@ func (m *Ad) ToDto() *Dto {
 				Value:       field.Value,
 			})
 		}
-		methods = append(methods, PaymentMethod{
+		methods = append(methods, dto.PaymentMethod{
 			MethodId: method.MethodId,
 			Display:  method.Display,
 			Method:   method.Method,
@@ -66,7 +67,7 @@ func (m *Ad) ToDto() *Dto {
 		})
 	}
 
-	return &Dto{
+	return &dto.Ad{
 		Type:            m.Type,
 		Asset:           m.Asset,
 		Fiat:            m.Fiat,
