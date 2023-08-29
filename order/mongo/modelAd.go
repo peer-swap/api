@@ -1,8 +1,8 @@
-package order
+package mongo
 
 import (
 	"github.com/kamva/mgm/v3"
-	"peerswap/order/dto"
+	"peerswap/order/core/dto"
 	"peerswap/reusable"
 )
 

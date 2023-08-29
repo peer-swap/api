@@ -16,8 +16,10 @@ func main() {
 	}
 
 	app := fiber.New()
-	order.NewModule(app).Register()
+	event := reusable.NewMapEvent()
+
 	ad.NewModule(app, event).Register()
+	order.NewModule(app, event).Register()
 
 	app.Listen(":3000")
 }

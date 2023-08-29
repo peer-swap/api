@@ -1,8 +1,6 @@
 package dto
 
-import (
-	"peerswap/reusable"
-)
+import "peerswap/reusable"
 
 type ServiceStoreInput struct {
 	Ad         string                   `json:"ad" validate:"required,alphanum"`
@@ -14,4 +12,15 @@ type ServiceStoreInput struct {
 	Seller     User                     `json:"seller,omitempty"`
 	Buyer      User                     `json:"buyer,omitempty"`
 	MerchantId string                   `json:"merchantId"`
+}
+
+type ServiceCancelInput struct {
+	By     string `json:"by"`
+	Reason string `json:"reason"`
+}
+
+type ServiceAppealInput struct {
+	By          string   `json:"by"`
+	Reason      string   `json:"reason"`
+	Attachments []string `json:"attachments"`
 }

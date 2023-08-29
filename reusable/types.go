@@ -18,10 +18,10 @@ const AdStatusOnline AdStatus = "Online"
 type OrderStatus string
 
 const (
-	OrderStatusPending       OrderStatus = "Pending"
-	OrderStatusAppealed      OrderStatus = "Appealed"
-	OrderStatusCanceled      OrderStatus = "Canceled"
-	OrderStatusNotifiedPaid  OrderStatus = "NotifiedPaid"
-	OrderStatusConfirmedPaid OrderStatus = "ConfirmedPaid"
-	OrderStatusCompleted     OrderStatus = "Completed"
+	OrderStatusPending         OrderStatus = "Pending"
+	OrderStatusAppealed        OrderStatus = "Appealed"
+	OrderStatusCanceled        OrderStatus = "Canceled"
+	OrderStatusPaymentReceived OrderStatus = "PaymentReceived"
+	OrderStatusPaymentSent     OrderStatus = "PaymentSent"
+	OrderStatusCompleted       OrderStatus = "Completed"
 )

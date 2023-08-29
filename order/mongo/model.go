@@ -1,8 +1,8 @@
-package order
+package mongo
 
 import (
 	"github.com/kamva/mgm/v3"
-	"peerswap/order/dto"
+	dto2 "peerswap/order/core/dto"
 	"peerswap/reusable"
 	"time"
 )
@@ -44,7 +44,7 @@ type Order struct {
 	Status           reusable.OrderStatus     `json:"status"`
 }
 
-func NewOrderFromDtoStoreInput(props *dto.ServiceStoreInput) *Order {
+func NewOrderFromDtoStoreInput(props *dto2.ServiceStoreInput) *Order {
 	return &Order{
 		Ad:         props.Ad,
 		Amount:     props.Amount,
@@ -62,8 +62,8 @@ func NewOrderFromDtoStoreInput(props *dto.ServiceStoreInput) *Order {
 	}
 }
 
-func (o Order) ToDtoOrder() *dto.Order {
-	return &dto.Order{
+func (o Order) ToDtoOrder() *dto2.Order {
+	return &dto2.Order{
 		Id:         o.ID.Hex(),
 		Ad:         o.Ad,
 		Amount:     o.Amount,
@@ -71,21 +71,21 @@ func (o Order) ToDtoOrder() *dto.Order {
 		Asset:      o.Asset,
 		Fiat:       o.Fiat,
 		MatchPrice: o.MatchPrice,
-		Seller: dto.User{
+		Seller: dto2.User{
 			Name:    o.Seller.Name,
 			Address: o.Seller.Address,
 		},
-		Buyer: dto.User{
+		Buyer: dto2.User{
 			Name:    o.Buyer.Name,
 			Address: o.Buyer.Address,
 		},
 		MerchantId: o.MerchantId,
-		Canceled: dto.Canceled{
+		Canceled: dto2.Canceled{
 			At:     o.Appealed.At,
 			By:     o.Appealed.By,
 			Reason: o.Appealed.Reason,
 		},
-		Appealed: dto.Appealed{
+		Appealed: dto2.Appealed{
 			At:          o.Appealed.At,
 			By:          o.Appealed.By,
 			Reason:      o.Appealed.Reason,
