@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"peerswap/order/core"
-	dto2 "peerswap/order/core/dto"
+	"peerswap/order/core/dto"
 	"peerswap/reusable"
 	"time"
 )
@@ -14,7 +14,16 @@ import (
 type Adapter struct {
 }
 
-func (m Adapter) FindAd(input *dto2.ServiceStoreInput) (*dto2.Ad, error) {
+func (m Adapter) Find(id string) (*dto.Order, error) {
+	order, err := m.find(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return order.ToDtoOrder(), nil
+}
+
+func (m Adapter) FindAd(input *dto.ServiceStoreInput) (*dto.Ad, error) {
 	var ad = &Ad{}
 	objectID, err := primitive.ObjectIDFromHex(input.Ad)
 	if err != nil {
@@ -37,7 +46,7 @@ func (m Adapter) FindAd(input *dto2.ServiceStoreInput) (*dto2.Ad, error) {
 	return ad.ToDtoAd(), nil
 }
 
-func (m Adapter) DecrementAdBalance(adId string, f float64) (*dto2.Ad, error) {
+func (m Adapter) DecrementAdBalance(adId string, f float64) (*dto.Ad, error) {
 	var ad = &Ad{}
 	if err := mgm.Coll(ad).FindByID(adId, ad); err != nil {
 		return nil, err
@@ -51,7 +60,7 @@ func (m Adapter) DecrementAdBalance(adId string, f float64) (*dto2.Ad, error) {
 	return ad.ToDtoAd(), nil
 }
 
-func (m Adapter) Create(input *dto2.ServiceStoreInput) (*dto2.Order, error) {
+func (m Adapter) Create(input *dto.ServiceStoreInput) (*dto.Order, error) {
 	o := NewOrderFromDtoStoreInput(input)
 	o.Status = reusable.OrderStatusPending
 	err := mgm.Coll(o).Create(o)
@@ -62,7 +71,7 @@ func (m Adapter) Create(input *dto2.ServiceStoreInput) (*dto2.Order, error) {
 	return o.ToDtoOrder(), nil
 }
 
-func (m Adapter) UpdateStatus(id string, status reusable.OrderStatus) (*dto2.Order, error) {
+func (m Adapter) UpdateStatus(id string, status reusable.OrderStatus) (*dto.Order, error) {
 	if status == reusable.OrderStatusCanceled || status == reusable.OrderStatusAppealed {
 		return nil, core.CantUpdateErr
 	}
@@ -87,7 +96,7 @@ func (m Adapter) UpdateStatus(id string, status reusable.OrderStatus) (*dto2.Ord
 	return o.ToDtoOrder(), nil
 }
 
-func (m Adapter) Cancel(id string, input *dto2.ServiceCancelInput) (*dto2.Order, error) {
+func (m Adapter) Cancel(id string, input *dto.ServiceCancelInput) (*dto.Order, error) {
 	o, err := m.find(id)
 	if err != nil {
 		return nil, err
@@ -103,7 +112,7 @@ func (m Adapter) Cancel(id string, input *dto2.ServiceCancelInput) (*dto2.Order,
 	return o.ToDtoOrder(), nil
 }
 
-func (m Adapter) Appeal(id string, input *dto2.ServiceAppealInput) (*dto2.Order, error) {
+func (m Adapter) Appeal(id string, input *dto.ServiceAppealInput) (*dto.Order, error) {
 	o, err := m.find(id)
 	if err != nil {
 		return nil, err

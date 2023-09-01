@@ -14,10 +14,13 @@ type DbInterface interface {
 	UpdateStatus(string, reusable.OrderStatus) (*dto.Order, error)
 	Cancel(string, *dto.ServiceCancelInput) (*dto.Order, error)
 	Appeal(string, *dto.ServiceAppealInput) (*dto.Order, error)
+	Find(id string)
 }
 
 type EscrowInterface interface {
 	PlaceOrder(dto.PlaceOrderInput) error
+	ReleaseToken(dto.PlaceOrderInput) error
+	UnfreezeToken(dto.PlaceOrderInput) error
 }
 
 type Service struct {
@@ -85,6 +88,19 @@ func (s Service) PaymentReceived(id string) (*dto.Order, error) {
 		return nil, err
 	}
 
+	err = s.escrow.ReleaseToken(dto.PlaceOrderInput{
+		Ad:     order.Ad,
+		Amount: order.Amount,
+		Type:   order.Type,
+		Asset:  order.Asset,
+		Fiat:   order.Fiat,
+		Seller: dto.PlaceOrderInputUser{Address: order.Seller.Address},
+		Buyer:  dto.PlaceOrderInputUser{Address: order.Buyer.Address},
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	s.emitter.Emit(event.NewOrderStatusUpdated(order, reusable.OrderStatusPaymentReceived))
 
 	return order, nil
@@ -92,6 +108,19 @@ func (s Service) PaymentReceived(id string) (*dto.Order, error) {
 
 func (s Service) Cancel(id string, input *dto.ServiceCancelInput) (*dto.Order, error) {
 	order, err := s.db.Cancel(id, input)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.escrow.UnfreezeToken(dto.PlaceOrderInput{
+		Ad:     order.Ad,
+		Amount: order.Amount,
+		Type:   order.Type,
+		Asset:  order.Asset,
+		Fiat:   order.Fiat,
+		Seller: dto.PlaceOrderInputUser{Address: order.Seller.Address},
+		Buyer:  dto.PlaceOrderInputUser{Address: order.Buyer.Address},
+	})
 	if err != nil {
 		return nil, err
 	}
